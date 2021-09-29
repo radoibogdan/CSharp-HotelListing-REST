@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.OpenApi.Models;
 
 namespace HotelListing
 {
@@ -24,6 +25,25 @@ namespace HotelListing
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages();
+
+            services.AddControllers();
+
+            // CORS Configuration
+            // Who is allowed to access this API, what methods are available and what headers must the user have
+            services.AddCors(o => {
+                o.AddPolicy("AllowAll", builder =>
+                    builder
+                        .AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                );
+            });
+
+            /* Swagger */
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "HotelListing", Version = "v1" });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -40,7 +60,15 @@ namespace HotelListing
                 app.UseHsts();
             }
 
+            /* Swagger */
+            app.UseSwagger();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "HotelListing v1"));
+
+            // CORS POLICY, user spicific Policy we defined in ConfigureServices
+            app.UseCors("AllowAll");
+
             app.UseHttpsRedirection();
+
             app.UseStaticFiles();
 
             app.UseRouting();
