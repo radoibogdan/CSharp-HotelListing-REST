@@ -1,5 +1,4 @@
-﻿using HotelListing.Controllers.Data;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -24,6 +23,4 @@ namespace HotelListing.Models
         public int Id { get; set; }
         public IList<HotelDTO> Hotels { get; set; }
     }
-
-    
 }

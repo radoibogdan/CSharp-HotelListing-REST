@@ -1,4 +1,4 @@
-﻿using HotelListing.Controllers.Data;
+﻿using HotelListing.Data;
 using HotelListing.IRepository;
 using Microsoft.EntityFrameworkCore;
 using System;

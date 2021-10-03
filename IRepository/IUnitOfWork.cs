@@ -1,4 +1,4 @@
-﻿using HotelListing.Controllers.Data;
+﻿using HotelListing.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;

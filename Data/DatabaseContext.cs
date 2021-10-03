@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 // Bridge between our classes and our actual database
-namespace HotelListing.Controllers.Data
+namespace HotelListing.Data
 {
     public class DatabaseContext : DbContext
     {

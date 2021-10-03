@@ -1,17 +1,22 @@
+using AutoMapper;
+using HotelListing.Configurations;
+using HotelListing.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.OpenApi.Models;
-using HotelListing.Controllers.Data;
-using Microsoft.EntityFrameworkCore;
-using HotelListing.Configurations;
+using HotelListing.IRepository;
+using HotelListing.Repository;
 
 namespace HotelListing
 {
@@ -27,7 +32,7 @@ namespace HotelListing
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddRazorPages();
+            // services.AddRazorPages();
 
             services.AddDbContext<DatabaseContext>(options => 
                 options.UseSqlServer(Configuration.GetConnectionString("sqlConnection"))
@@ -37,15 +42,17 @@ namespace HotelListing
             // Who is allowed to access this API, what methods are available and what headers must the user have
             services.AddCors(o => {
                 o.AddPolicy("AllowAll", builder =>
-                    builder
-                        .AllowAnyOrigin()
+                    builder.AllowAnyOrigin()
                         .AllowAnyMethod()
-                        .AllowAnyHeader()
-                );
+                        .AllowAnyHeader());
             });
 
             /* Auto Mapper */
             services.AddAutoMapper(typeof(MapperInitializer));
+
+            /* Register IUnitOfWork */
+            // AddTransient - provide a fresh copy every time a client contacts the server
+            services.AddTransient<IUnitOfWork, UnitOfWork>();
 
             /* Swagger */
             services.AddSwaggerGen(c =>
@@ -53,7 +60,9 @@ namespace HotelListing
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "HotelListing", Version = "v1" });
             });
 
-            services.AddControllers();
+            // NewSoft => Ignore some Loop Reference Warnings
+            services.AddControllers().AddNewtonsoftJson(op 
+                => op.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -74,7 +83,7 @@ namespace HotelListing
             app.UseSwagger();
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "HotelListing v1"));
 
-            // CORS POLICY, user spicific Policy we defined in ConfigureServices
+            // CORS POLICY, user specific Policy we defined in ConfigureServices
             app.UseCors("AllowAll");
 
             app.UseHttpsRedirection();
@@ -87,7 +96,8 @@ namespace HotelListing
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapRazorPages();
+                //endpoints.MapRazorPages();
+                endpoints.MapControllers();
             });
         }
     }

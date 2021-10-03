@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace HotelListing.Controllers.Data
+namespace HotelListing.Data
 {
     public class Country
     {

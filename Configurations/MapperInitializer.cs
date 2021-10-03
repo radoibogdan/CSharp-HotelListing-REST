@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using HotelListing.Controllers.Data;
+using HotelListing.Data;
 using HotelListing.Models;
 using System;
 using System.Collections.Generic;
