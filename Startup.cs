@@ -35,8 +35,13 @@ namespace HotelListing
             // services.AddRazorPages();
 
             services.AddDbContext<DatabaseContext>(options => 
-                options.UseSqlServer(Configuration.GetConnectionString("sqlConnection"))
+                 options.UseSqlServer(Configuration.GetConnectionString("sqlConnection"))
             );
+
+            // Authentication
+            services.AddAuthentication();
+            // Abstract config to ServiceExtensions.cs file
+            services.ConfigureIdentity();
 
             // CORS Configuration
             // Who is allowed to access this API, what methods are available and what headers must the user have

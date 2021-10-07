@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,9 @@ using System.Threading.Tasks;
 // Bridge between our classes and our actual database
 namespace HotelListing.Data
 {
-    public class DatabaseContext : DbContext
+    // IdentityDbContext - take advantage of Identity services, install Identity.EntityFrameworkCore
+    // By default uses IdentityUser, but we have ApiUser
+    public class DatabaseContext : IdentityDbContext<ApiUser>
     {
         // Define Constructor
         public DatabaseContext(DbContextOptions options) : base(options)
@@ -21,6 +24,9 @@ namespace HotelListing.Data
         public DbSet<Hotel> Hotels { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            // IdentityDbContext = base
+            base.OnModelCreating(builder);
+
             builder.Entity<Country>().HasData(
                 new Country
                 {
