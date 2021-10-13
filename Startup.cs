@@ -17,6 +17,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using HotelListing.IRepository;
 using HotelListing.Repository;
+using HotelListing.Services;
 
 namespace HotelListing
 {
@@ -42,6 +43,8 @@ namespace HotelListing
             services.AddAuthentication();
             // Abstract config to ServiceExtensions.cs file
             services.ConfigureIdentity();
+            // JWT
+            services.ConfigureJWT(Configuration);
 
             // CORS Configuration
             // Who is allowed to access this API, what methods are available and what headers must the user have
@@ -58,6 +61,9 @@ namespace HotelListing
             /* Register IUnitOfWork */
             // AddTransient - provide a fresh copy every time a client contacts the server
             services.AddTransient<IUnitOfWork, UnitOfWork>();
+
+            // Auth - Register Service AuthManager
+            services.AddScoped<IAuthManager, AuthManager>();
 
             /* Swagger */
             services.AddSwaggerGen(c =>
