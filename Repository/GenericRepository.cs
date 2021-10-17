@@ -1,11 +1,13 @@
 ﻿using HotelListing.Data;
 using HotelListing.IRepository;
+using HotelListing.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using X.PagedList;
 
 namespace HotelListing.Repository
 {
@@ -78,6 +80,25 @@ namespace HotelListing.Repository
 
             // AsNoTracking = don't modify the record in the db
             return await query.AsNoTracking().ToListAsync();
+        }
+
+        public async Task<IPagedList<T>> GetPagedList(RequestParams requestParams, List<string> includes = null)
+        {
+            // Get all the record in the table
+            IQueryable<T> query = _db;
+
+            // For each ForeignKey in includes, get the record corresponding - sql join
+            // ex: Country in includes => gets hotel and its corresponding country columns
+            if (includes != null)
+            {
+                foreach (var includeProperty in includes)
+                {
+                    query = query.Include(includeProperty);
+                }
+            }
+
+            // AsNoTracking = don't modify the record in the db
+            return await query.AsNoTracking().ToPagedListAsync(requestParams.PageNumber, requestParams.PageSize);
         }
 
         public async Task Insert(T entity)

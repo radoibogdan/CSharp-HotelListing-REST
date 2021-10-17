@@ -28,14 +28,15 @@ namespace HotelListing.Controllers
             _mapper = mapper;
         }
 
+        // ------------------ GET ------------------ // 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetCountries()
+        public async Task<IActionResult> GetCountries([FromQuery] RequestParams requestParams)
         {
             try
             {
-                var countries = await _unitOfWork.Countries.GetAll();
+                var countries = await _unitOfWork.Countries.GetPagedList(requestParams);
                 // return a list of CountryDTOs
                 var results = _mapper.Map<IList<CountryDTO>>(countries);
                 return Ok(results);
@@ -48,6 +49,7 @@ namespace HotelListing.Controllers
             }
         }
 
+        // ------------------ GET by Id ------------------ // 
         [HttpGet("{id:int}", Name = "GetCountry")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -71,7 +73,7 @@ namespace HotelListing.Controllers
             }
         }
 
-        // POST
+        // ------------------ POST ------------------ // 
         //[Authorize(Roles = "Administrator")]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -101,7 +103,7 @@ namespace HotelListing.Controllers
             }
         }
 
-        // PUT
+        // ------------------ PUT ------------------ // 
         [Authorize]
         [HttpPut("{id:int}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -139,6 +141,7 @@ namespace HotelListing.Controllers
             }
         }
 
+        // ------------------ DELETE ------------------ // 
         [Authorize]
         [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
