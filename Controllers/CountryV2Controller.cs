@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace HotelListing.Controllers
 {
+    // USED in 36 - Versioning Chapter
     //[ApiVersion("2.0")]
     // Set as deprecated
     [ApiVersion("2.0", Deprecated = true)]

@@ -38,7 +38,8 @@ namespace HotelListing
             services.AddDbContext<DatabaseContext>(options => 
                  options.UseSqlServer(Configuration.GetConnectionString("sqlConnection"))
             );
-
+            // Caching + AddControllers method below(caching config for global config of duration)
+            services.ConfigureHttpCacheHeaders();
             // Authentication
             services.AddAuthentication();
             // Abstract config to ServiceExtensions.cs file
@@ -72,7 +73,13 @@ namespace HotelListing
             });
 
             // NewSoft => Ignore some Loop Reference Warnings
-            services.AddControllers().AddNewtonsoftJson(op 
+            services.AddControllers(config => {
+                // Caching
+                config.CacheProfiles.Add("120SecondsDuration", new CacheProfile
+                {
+                    Duration = 120
+                });
+            }).AddNewtonsoftJson(op 
                 => op.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
             // Versioning
@@ -106,6 +113,10 @@ namespace HotelListing
             app.UseHttpsRedirection();
 
             //app.UseStaticFiles();
+
+            // Caching
+            app.UseResponseCaching();
+            app.UseHttpCacheHeaders();
 
             app.UseRouting();
             
