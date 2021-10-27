@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using HotelListing.IRepository;
 using HotelListing.Repository;
 using HotelListing.Services;
+using AspNetCoreRateLimit;
 
 namespace HotelListing
 {
@@ -33,17 +34,25 @@ namespace HotelListing
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // services.AddRazorPages();
-
+            // Database
             services.AddDbContext<DatabaseContext>(options => 
                  options.UseSqlServer(Configuration.GetConnectionString("sqlConnection"))
             );
+
+            // Rate Limiting
+            services.AddMemoryCache();
+            services.ConfigureRateLimiting();
+            services.AddHttpContextAccessor(); // gives access to the controller
+
             // Caching + AddControllers method below(caching config for global config of duration)
             services.ConfigureHttpCacheHeaders();
+            
             // Authentication
             services.AddAuthentication();
+            
             // Abstract config to ServiceExtensions.cs file
             services.ConfigureIdentity();
+            
             // JWT
             services.ConfigureJWT(Configuration);
 
@@ -74,13 +83,13 @@ namespace HotelListing
 
             // NewSoft => Ignore some Loop Reference Warnings
             services.AddControllers(config => {
-                // Caching
                 config.CacheProfiles.Add("120SecondsDuration", new CacheProfile
                 {
                     Duration = 120
                 });
-            }).AddNewtonsoftJson(op 
-                => op.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+            }).AddNewtonsoftJson(op =>
+                op.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+            );
 
             // Versioning
             services.ConfigureVersioning();
@@ -117,6 +126,9 @@ namespace HotelListing
             // Caching
             app.UseResponseCaching();
             app.UseHttpCacheHeaders();
+
+            // Rate Limiting
+            // app.UseIpRateLimiting();
 
             app.UseRouting();
             
