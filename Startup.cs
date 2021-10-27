@@ -93,6 +93,16 @@ namespace HotelListing
 
             // Versioning
             services.ConfigureVersioning();
+
+            // ------------- Rate Limit -------------
+            // needed to load configuration from appsettings.json
+            services.AddOptions();
+            //load general configuration from appsettings.json
+            services.Configure<IpRateLimitOptions>(Configuration.GetSection("IpRateLimiting"));
+            //load ip rules from appsettings.json
+            services.Configure<IpRateLimitPolicies>(Configuration.GetSection("IpRateLimitPolicies"));
+            // inject counter and rules stores
+            services.AddInMemoryRateLimiting();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -128,7 +138,7 @@ namespace HotelListing
             app.UseHttpCacheHeaders();
 
             // Rate Limiting
-            // app.UseIpRateLimiting();
+            app.UseIpRateLimiting();
 
             app.UseRouting();
             
